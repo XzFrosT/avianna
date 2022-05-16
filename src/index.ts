@@ -9,11 +9,10 @@ import { verifyDiscordRequest } from "./verify";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const PUBLIC_KEY = process.env.PUBLIC_KEY;
 
 app.use(
 	express.json({
-		verify: verifyDiscordRequest(PUBLIC_KEY)
+		verify: verifyDiscordRequest(process.env.PUBLIC_KEY)
 	})
 );
 
@@ -21,6 +20,7 @@ app.post("/interactions", async (req: any, res: any) => {
 	const interaction = req.body;
 	
 	if (interaction.type === InteractionType.PING) {
+		console.log("received discord ping")
 		return res.send({ type: InteractionResponseType.PONG });
 	}
 })

@@ -1,6 +1,5 @@
 .env
 i
 package-lock.json
-environment.d.ts
 node_modules
 dist

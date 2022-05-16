@@ -5,6 +5,7 @@ require('dotenv').config({
 import * as express from 'express';
 import { InteractionType, InteractionResponseType } from 'discord-interactions';
 
+import { loadCommands } from "./utils/command";
 import { verifyDiscordRequest } from "./verify";
 
 const app = express();
@@ -16,6 +17,10 @@ app.use(
 	})
 );
 
+app.get("/", (req, res) => {
+	res.send("yo!")
+})
+
 app.post("/interactions", async (req: any, res: any) => {
 	const interaction = req.body;
 	
@@ -25,17 +30,12 @@ app.post("/interactions", async (req: any, res: any) => {
 	}
 	
 	if (interaction.type === InteractionType.APPLICATION_COMMAND) {
-		if (interaction.data.name === "test") {
-			return res.send({
-				type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-				data: {
-					content: "hi <3"
-				}
-			})
-		}
+		const command = (await import(`./commands/${interaction.data.name}`)).default
+		return command.execute(req, res);
 	}
 })
 
 app.listen(PORT, () => {
 	console.log(`listening at port ${PORT}`);
+	loadCommands();
 });

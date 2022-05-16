@@ -23,6 +23,17 @@ app.post("/interactions", async (req: any, res: any) => {
 		console.log("received discord ping")
 		return res.send({ type: InteractionResponseType.PONG });
 	}
+	
+	if (interaction.type === InteractionType.APPLICATION_COMMAND) {
+		if (interaction.data.name === "test") {
+			return res.send({
+				type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+				data: {
+					content: "hi <3"
+				}
+			})
+		}
+	}
 })
 
 app.listen(PORT, () => {

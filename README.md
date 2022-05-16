@@ -1,1 +1,1 @@
-Avianna my Discord personal bot with http interactions :)
+Avianna my personal Discord bot with http interactions :)

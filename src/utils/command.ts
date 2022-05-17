@@ -60,9 +60,9 @@ export const createCommand = (command: CommandInterface) => {
 export const deleteCommand = (source: any) => {
 	request(endpoint + `/${source.id}`, {
 		method: "DELETE"
-	})
+	});
 	
-	console.log(`removed ${source.name} command`)
+	console.log(`removed ${source.name} command`);
 }
 
 export const updateCommand = (command: CommandInterface, source: any) => {
@@ -71,5 +71,5 @@ export const updateCommand = (command: CommandInterface, source: any) => {
 		body: command
 	});
 	
-	console.log(`updated ${command.name} command.`)
+	console.log(`updated ${command.name} command.`);
 }

@@ -17,20 +17,17 @@ app.use(
 	})
 );
 
-app.get("/", (req, res) => {
-	res.send("yo!")
-})
-
 app.post("/interactions", async (req: any, res: any) => {
-	const interaction = req.body;
-	
-	if (interaction.type === InteractionType.PING) {
-		console.log("received discord ping")
-		return res.send({ type: InteractionResponseType.PONG });
+	if (req.body.type === InteractionType.PING) {
+		return res.send({
+			type: InteractionResponseType.PONG
+		});
+		
+		console.log("Discord ping received.");
 	}
 	
-	if (interaction.type === InteractionType.APPLICATION_COMMAND) {
-		const command = (await import(`./commands/${interaction.data.name}`)).default
+	if (req.body.type === InteractionType.APPLICATION_COMMAND) {
+		const command = (await import(`./commands/${req.body.data.name}`)).default;
 		return command.execute(req, res);
 	}
 })

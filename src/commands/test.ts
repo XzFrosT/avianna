@@ -8,12 +8,12 @@ export default <CommandInterface>{
 	description: "test command",
 	description_localizations: {},
 	options: [],
-	execute: async (req: any, res: any) => {
-		return res.send({
+	execute: async (interaction: any, DiscordAPI: any) => {
+		return {
 			type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
 			data: {
 				content: "hi :-)"
 			}
-		});
+		}
 	}
 }

@@ -5,11 +5,11 @@ require('dotenv').config({
 import * as express from 'express';
 import { InteractionType, InteractionResponseType } from 'discord-interactions';
 
-import { loadCommands } from "./utils/command";
+import { handleCommand } from "./utils/command";
+import { AppPort } from "./utils/config";
 import { verifyDiscordRequest } from "./verify";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(
 	express.json({
@@ -17,22 +17,22 @@ app.use(
 	})
 );
 
+app.get("/", (req: any, res: any) => {
+	res.send("")
+});
+
 app.post("/interactions", async (req: any, res: any) => {
 	if (req.body.type === InteractionType.PING) {
 		return res.send({
 			type: InteractionResponseType.PONG
 		});
-		
-		console.log("Discord ping received.");
 	}
 	
 	if (req.body.type === InteractionType.APPLICATION_COMMAND) {
-		const command = (await import(`./commands/${req.body.data.name}`)).default;
-		return command.execute(req, res);
+		return res.status(200).send(await handleCommand(req.body));
 	}
 })
 
-app.listen(PORT, () => {
-	console.log(`listening at port ${PORT}`);
-	loadCommands();
+app.listen(AppPort, () => {
+	console.log(`listening at port ${AppPort}`);
 });

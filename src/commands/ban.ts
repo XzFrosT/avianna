@@ -1,7 +1,6 @@
 import { InteractionResponseType } from 'discord-interactions';
 
 import { CommandInterface } from "../utils/command";
-import request from "../utils/request";
 
 export default <CommandInterface>{
 	name: "ban",
@@ -34,14 +33,12 @@ export default <CommandInterface>{
 			required: false
 		}
 	],
-	execute: async (req: any, res: any) => {
-		console.log(req.body);
-		
-		return res.send({
+	execute: async (interaction: any, DiscordAPI: any) => {
+		return {
 			type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
 			data: {
 				content: "Banned!"
 			}
-		})
+		}
 	}
 }

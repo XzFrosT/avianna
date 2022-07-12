@@ -3,10 +3,11 @@ require('dotenv').config({
 });
 
 import * as express from 'express';
+import * as mongoose from 'mongoose';
 import { InteractionType, InteractionResponseType } from 'discord-interactions';
 
 import { handleCommand } from "./utils/command";
-import { AppPort } from "./utils/config";
+import { AppPort, DatabaseUri } from "./utils/config";
 import { verifyDiscordRequest } from "./verify";
 
 const app = express();
@@ -16,6 +17,10 @@ app.use(
 		verify: verifyDiscordRequest(process.env.PUBLIC_KEY)
 	})
 );
+
+mongoose.connect(DatabaseUri).then(() => {
+	console.log(`Database connected.`);
+})
 
 app.get("/", (req: any, res: any) => {
 	res.send("")
@@ -34,5 +39,5 @@ app.post("/interactions", async (req: any, res: any) => {
 })
 
 app.listen(AppPort, () => {
-	console.log(`listening at port ${AppPort}`);
+	console.log(`Listening at port ${AppPort}`);
 });

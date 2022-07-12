@@ -16,7 +16,7 @@ export interface CommandInterface {
 }
 
 export const handleCommand = async (interaction: any) => {
-	const command = (await import(__dirname.replace("utils") + `./commands/${interaction.data.name}`)).default;
+	const command = (await import(__dirname.replace("utils", "") + `./commands/${interaction.data.name}`)).default;
 	
 	return await command.execute(interaction, DiscordAPI);
 }

@@ -1,8 +1,10 @@
+import { REST } from '@discordjs/rest';
 import { InteractionResponseType } from 'discord-interactions';
+import { Request } from 'express';
 
-import { CommandInterface } from "../utils/command";
+import { Command } from "../utils/command";
 
-export default <CommandInterface>{
+export default <Command>{
 	name: "ban",
 	name_localizations: {},
 	description: "Ban a member from this server",
@@ -33,7 +35,8 @@ export default <CommandInterface>{
 			required: false
 		}
 	],
-	execute: async (interaction: any, DiscordAPI: any) => {
+	dm_permission: false,
+	execute: async (req: Request, DiscordAPI: REST) => {
 		return {
 			type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
 			data: {

@@ -16,7 +16,7 @@ interface LogOptions {
 }
 
 export default async (DiscordAPI: REST, Log: LogOptions): Promise<void> => {
-	const ActionEmbedColor = (Object.keys(Colors)).filter((color: string) => color.toLowerCase().includes(Log.action+"log"))[0];
+	const ActionEmbedColor = (Object.keys(Colors)).filter((color: string) => color.toLowerCase().split(".")[1] === Log.action+"log")[0];
 	const FieldsEmbed = [
 		{
 			name: "User",

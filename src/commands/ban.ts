@@ -1,6 +1,6 @@
 import parseDuration from 'parse-duration';
 import { REST, RequestData } from '@discordjs/rest';
-import { APIBan, APIEmbed, APIInteractionResponse, ButtonStyle, ComponentType, InteractionResponseType, Routes, Snowflake } from 'discord-api-types/v10';
+import { APIBan, APIEmbed, APIInteractionResponse, ButtonStyle, ComponentType, InteractionResponseType, MessageFlags, Routes, Snowflake } from 'discord-api-types/v10';
 import { Request } from 'express';
 
 import bans from "../schemas/ban";
@@ -56,7 +56,8 @@ export default <Command>{
 			return {
 				type: InteractionResponseType.ChannelMessageWithSource,
 				data: {
-					content: AlreadyBannedMessage
+					content: AlreadyBannedMessage,
+					flags: MessageFlags.Ephemeral
 				}
 			}
 		}
@@ -85,7 +86,7 @@ export default <Command>{
 			}
 		}
 		
-		//await DiscordAPI.put(Routes.guildBan(req?.body?.guild_id, ProvidedUser?.user?.id), metadata);
+		await DiscordAPI.put(Routes.guildBan(req?.body?.guild_id, ProvidedUser?.user?.id), metadata);
 		
 		var BanEmbed: APIEmbed = {
 			description: `**Reason:** ${ProvidedReason ?? "Unspecified"}`,

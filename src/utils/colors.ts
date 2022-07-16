@@ -5,8 +5,10 @@ export default (color: string): number => {
 	return parseInt(color.replace('#', ''), 16);
 }
 
-export const Colors: { [key: string]: string } = {
+export const Colors: {
+	[key: string]: string
+} = {
 	"BLACK.Ban": "#2a2b2d",
-	"GREEN.unban": "",
+	"GREEN.UnbanLog": "#4fad81",
 	"RED.BanLog": "#eb4a4a"
 }

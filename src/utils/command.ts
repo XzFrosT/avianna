@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import { REST } from '@discordjs/rest';
-import { APIApplicationCommandOption, Routes } from 'discord-api-types/v10';
-import { InteractionResponseType } from 'discord-interactions';
+import { APIApplicationCommandOption, APIInteractionResponse, InteractionResponseType, MessageFlags, Routes } from 'discord-api-types/v10';
 import { Request } from 'express';
 
 import { DiscordAppId } from "./config";
@@ -20,24 +19,24 @@ export interface Command {
 	default_member_permissions?: string;
 	dm_permission?: boolean;
 	type?: any;
-	execute?: (req: Request, DiscordAPI: REST) => Promise<any>;
+	execute?: (req: Request, DiscordAPI: REST) => Promise<APIInteractionResponse>;
 }
 
-export const handleCommand = async (req: Request) => {
+export default async (req: Request): Promise<APIInteractionResponse> => {
 	const command = await import(__dirname.substring(0, __dirname.lastIndexOf("/")) + `/commands/${req.body.data.name}`);
 	
 	if (!command) return {
-		type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+		type: InteractionResponseType.ChannelMessageWithSource,
 		data: {
 			content: `Unknown command.`,
-			ephemeral: true
+			flags: MessageFlags.Ephemeral
 		}
 	}
 	
 	return await command.default.execute(req, DiscordAPI);
 }
 
-export const prepareCommands = async () => {
+export const prepareCommands = async (): Promise<number> => {
 	const ExistingCommands: any = await getApplicationCommands();
 	const AvailableCommands = fs.readdirSync(__dirname.substring(0, __dirname.lastIndexOf("/")) + "/commands/")
 	.map((CommandFile: string) => CommandFile.substring(0, CommandFile.lastIndexOf(".")));
@@ -80,9 +79,12 @@ export const createApplicationCommand = async (command: Command) => {
 	});
 }
 
+export const deleteApplicationCommand = async (command: any) => {
+	return await DiscordAPI.delete(Routes.applicationCommand(DiscordAppId, command?.id));
+}
+
 export const editApplicationCommand = async (command: any, updatedCommand: Command) => {
 	return await DiscordAPI.patch(Routes.applicationCommand(DiscordAppId, command?.id), {
 		body: transformCommand(updatedCommand)
 	});
 }
-

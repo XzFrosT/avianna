@@ -1,5 +1,5 @@
 import { REST } from '@discordjs/rest';
-import { InteractionResponseType } from 'discord-interactions';
+import { APIInteractionResponse, InteractionResponseType } from 'discord-api-types/v10';
 import { Request } from 'express';
 
 import { Command } from "../utils/command";
@@ -11,9 +11,9 @@ export default <Command>{
 	description_localizations: {},
 	options: [],
 	dm_permission: true,
-	execute: async (req: Request, DiscordAPI: REST) => {
+	execute: async (req: Request, DiscordAPI: REST): Promise<APIInteractionResponse> => {
 		return {
-			type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+			type: InteractionResponseType.ChannelMessageWithSource,
 			data: {
 				content: "hi :-)"
 			}

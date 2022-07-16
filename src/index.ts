@@ -4,14 +4,19 @@ require('dotenv').config({
 
 import * as express from 'express';
 import * as mongoose from 'mongoose';
-import { InteractionType, InteractionResponseType } from 'discord-interactions';
+import { InteractionType, InteractionResponseType } from 'discord-api-types/v10';
 import { Request, Response } from 'express';
 
-import { handleCommand, prepareCommands } from "./utils/command";
+import handleComponents from "./helpers/handlers/components";
+import handleCommand from "./utils/command";
+import { unbanChecker } from "./helpers/automod";
 import { AppPort, DatabaseUri, DiscordAppPublicKey } from "./utils/config";
 import { verifyDiscordRequest } from "./verify";
 
 const app = express();
+
+mongoose.connect(DatabaseUri).then(() => console.log("Connected to Database."))
+unbanChecker();
 
 app.use(
 	express.json({
@@ -19,22 +24,22 @@ app.use(
 	})
 );
 
-mongoose.connect(DatabaseUri).then(() => {
-	console.log(`Database connected.`);
-});
+app.get("/", (req: Request, res: Response) => {
+	return res.send("");
+})
 
 app.post("/interactions", async (req: Request, res: Response) => {
-	if (req.body.type === InteractionType.PING) {
-		//prepareCommands();
-		
+	if (req.body.type === InteractionType.Ping) {
 		return res.status(200).send({
-			type: InteractionResponseType.PONG
+			type: InteractionResponseType.Pong
 		});
-	}
-	
-	if (req.body.type === InteractionType.APPLICATION_COMMAND) {
+	} else if (req.body.type === InteractionType.ApplicationCommand) {
 		return res.status(200).send(
 			await handleCommand(req)
+		);
+	} else if (req.body.type === InteractionType.MessageComponent) {
+		return res.status(200).send(
+			await handleComponents(req)
 		);
 	}
 	
@@ -42,7 +47,5 @@ app.post("/interactions", async (req: Request, res: Response) => {
 });
 
 app.listen(AppPort, () => {
-	prepareCommands()
-	
 	console.log(`Listening at port ${AppPort}`);
 });

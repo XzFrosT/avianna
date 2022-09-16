@@ -40,6 +40,7 @@ export default <Command>{
 			required: false
 		}
 	],
+	default_member_permissions: "0",
 	dm_permission: false,
 	execute: async (req: Request, DiscordAPI: REST): Promise<APIInteractionResponse> => {
 		const ProvidedUser: any = parseOptions(req, "member");

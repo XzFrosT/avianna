@@ -24,6 +24,15 @@ export function forHumans(ms: number): string {
 	return returntext.trim();
 }
 
+export async function getDiscordUser(userId: Snowflake): Promise<APIUser | any> {
+	try {
+		return await DiscordAPI.get(Routes.user(userId));
+	} catch(error: any) {
+		console.error(error);
+		return null;
+	}
+}
+
 export async function getGuildMember(guildId: Snowflake, userId: Snowflake): Promise<APIGuildMember | any> {
 	try {
 		return await DiscordAPI.get(Routes.guildMember(guildId, userId));

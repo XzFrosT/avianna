@@ -23,7 +23,7 @@ export interface Command {
 }
 
 export default async (req: Request): Promise<APIInteractionResponse> => {
-	const command = await import(__dirname.substring(0, __dirname.lastIndexOf("/")) + `/commands/${req.body.data.name}`);
+	var command = await import(__dirname.substring(0, __dirname.lastIndexOf("/")) + `/commands/${req.body.data.name}`);
 	
 	if (!command) return {
 		type: InteractionResponseType.ChannelMessageWithSource,
@@ -32,6 +32,8 @@ export default async (req: Request): Promise<APIInteractionResponse> => {
 			flags: MessageFlags.Ephemeral
 		}
 	}
+	
+	if (fs.existsSync(command) && fs.lstatSync(command).isDirectory()) command = await import(command + `/${req.body.data.name}`);
 	
 	return await command.default.execute(req, DiscordAPI);
 }
@@ -51,7 +53,7 @@ export const prepareCommands = async (): Promise<number> => {
 				const MatchedCommand = ExistingCommands.filter((ACommand: any) => ACommand.name === command.name)[0];
 				
 				editApplicationCommand(MatchedCommand, command);
-			}
+			} else createApplicationCommand(command);
 		} else createApplicationCommand(command);
 	});
 	
@@ -74,17 +76,35 @@ export const getApplicationCommands = async () => {
 }
 
 export const createApplicationCommand = async (command: Command) => {
-	return await DiscordAPI.post(Routes.applicationCommands(DiscordAppId), {
-		body: transformCommand(command)
-	});
+	console.log(`Creating ${command.name} command.`);
+	
+	try {
+		return await DiscordAPI.post(Routes.applicationCommands(DiscordAppId), {
+			body: transformCommand(command)
+		});
+	} catch(error: any) {
+		console.error(error);
+	}
 }
 
 export const deleteApplicationCommand = async (command: any) => {
-	return await DiscordAPI.delete(Routes.applicationCommand(DiscordAppId, command?.id));
+	console.log(`deleting ${command.name} command.`)
+	
+	try {
+		return await DiscordAPI.delete(Routes.applicationCommand(DiscordAppId, command?.id));
+	} catch(error: any) {
+		console.error(error);
+	}
 }
 
 export const editApplicationCommand = async (command: any, updatedCommand: Command) => {
-	return await DiscordAPI.patch(Routes.applicationCommand(DiscordAppId, command?.id), {
-		body: transformCommand(updatedCommand)
-	});
+	console.log(`updating ${command.name} command.`)
+	
+	try {
+		return await DiscordAPI.patch(Routes.applicationCommand(DiscordAppId, command?.id), {
+			body: transformCommand(updatedCommand)
+		});
+	} catch(error: any) {
+		console.error(error);
+	}
 }

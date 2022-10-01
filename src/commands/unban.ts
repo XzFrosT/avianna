@@ -28,7 +28,6 @@ export default <Command>{
 	default_member_permissions: "0",
 	dm_permission: false,
 	execute: async (req: Request, DiscordAPI: REST): Promise<APIInteractionResponse> => {
-		console.log(req.body.data.options[0]);
 		const ProvidedId = parseOptions(req, "user");
 		const Moderator = req.body?.user ?? req.body?.member?.user;
 		

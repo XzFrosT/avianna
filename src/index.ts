@@ -7,6 +7,7 @@ import * as mongoose from 'mongoose';
 import { InteractionType, InteractionResponseType } from 'discord-api-types/v10';
 import { Request, Response } from 'express';
 
+import handleAutocomplete from "./helpers/handlers/autocomplete";
 import handleComponents from "./helpers/handlers/components";
 import handleCommand, { getApplicationCommands, prepareCommands } from "./utils/command";
 import { unbanChecker } from "./helpers/automod";
@@ -40,6 +41,10 @@ app.post("/interactions", async (req: Request, res: Response) => {
 	} else if (req.body.type === InteractionType.MessageComponent) {
 		return res.status(200).send(
 			await handleComponents(req)
+		);
+	} else if (req.body.type === InteractionType.ApplicationCommandAutocomplete) {
+		return res.status(200).send(
+			await handleAutocomplete(req)
 		);
 	}
 	

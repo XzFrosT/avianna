@@ -61,14 +61,9 @@ export const prepareCommands = async (): Promise<number> => {
 }
 
 export const transformCommand = (command: Command) => {
-	return {
-		name: command.name,
-		name_localizations: command.name_localizations,
-		description: command.description,
-		description_localizations: command.description_localizations,
-		options: command.options,
-		dm_permission: command.dm_permission
-	}
+	const { execute: _, ...transformedCommand } = command;
+	
+	return transformedCommand;
 }
 
 export const getApplicationCommands = async () => {

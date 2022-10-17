@@ -1,4 +1,4 @@
-import { APIGuildMember, APIUser, ApplicationCommandOptionType, DefaultUserAvatarAssets, ImageFormat, RouteBases, Routes, Snowflake } from 'discord-api-types/v10';
+import { APIAttachment, APIGuildMember, APIPartialChannel, APIRole, APIUser, ApplicationCommandOptionType, DefaultUserAvatarAssets, ImageFormat, RouteBases, Routes, Snowflake } from 'discord-api-types/v10';
 import { Request } from 'express';
 
 import { DiscordAPI } from "./discord";
@@ -63,19 +63,37 @@ export async function me(): Promise<APIUser | any> {
 	}
 }
 
-export function parseOptions(req: Request, optionName: string): any {
+export function parseOptions(req: Request, optionName: string): {
+	user: APIUser;
+	member: APIGuildMember;
+	role: APIRole;
+	attachment: APIAttachment;
+	channel: APIPartialChannel;
+} | string | number | boolean | any {
 	const option = req.body.data.options.filter((opt: any) => opt.name === optionName)[0];
-	
 	if (!option) return null;
 	
-	if (option.type === ApplicationCommandOptionType.User) {
-		if ('members' in req.body.data.resolved) {
-			return {
-				user: { ...req.body.data.resolved.users[option.value] },
-				member: { ...req.body.data.resolved.members[option.value] }
-			}
-		} else return { user: req.body.data.resolved.users[option.value] };
-	} else if (option.type === ApplicationCommandOptionType.String) {
+	var mentionableOnly = JSON.parse(JSON.stringify(ApplicationCommandOptionType));
+	var property = [
+		["User", "Member", "Attachment", "Channel", "Role", "Mentionable"],
+		["String", "Boolean", "Integer", "Number"]
+	]
+	
+	property[1].forEach((e: any) => delete mentionableOnly[e]);
+	if ([...Object.values(mentionableOnly).filter((k: any) => !isNaN(k))].includes(option.type)) {
+		var values: {
+			[key: string]: any;
+		} = {};
+		
+		property[0].forEach((prop: any) => {
+			if (`${String(prop).toLowerCase()}s` in req.body.data?.resolved) Object.defineProperty(values, String(prop).toLowerCase(), {
+				enumerable: true,
+				value: { ...req.body.data?.resolved[`${String(prop).toLowerCase()}s`][option.value] }
+			});
+		});
+		
+		return values;
+	} else {
 		return option.value;
 	}
 }

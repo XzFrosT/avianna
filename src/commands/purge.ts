@@ -61,7 +61,8 @@ export default <Command>{
 		return {
 			type: InteractionResponseType.ChannelMessageWithSource,
 			data: {
-				content: successMessage
+				content: successMessage,
+				flags: MessageFlags.Ephemeral
 			}
 		}
 	}

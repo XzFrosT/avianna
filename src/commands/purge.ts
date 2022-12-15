@@ -46,17 +46,22 @@ export default <Command>{
 		const filteredMessagesAuthor = ProvidedMember ? `by ${ProvidedMember.user.username}#${ProvidedMember.user.discriminator}` : "";
 		var filter2WeeksOldMessages: APIMessage[] = fetchedMessages.filter((message: APIMessage) => (new Date(message.timestamp).getTime() > twoWeeksAgo));
 		let deletedMessagesCount: number = 0;
+		var successMessage = "";
 		
-		if (ProvidedMember) {
-			var filterAuthorMessages: APIMessage[] = filter2WeeksOldMessages.filter((message: APIMessage) => message.author.id === ProvidedMember.user.id).slice(0, ProvidedAmount);
-			deletedMessagesCount = await bulkDeleteMessagesInChannel(DiscordAPI, currentChannelId, filterAuthorMessages.map((message: APIMessage) => message.id))
+		if (fetchedMessages.length < 1 || filter2WeeksOldMessages.length < 1) {
+			successMessage = "There's no message for me to purge in this channel, the reason could be this channel is empty or all the messages is older than 2 weeks.";
 		} else {
-			let firstNThMessages = filter2WeeksOldMessages.slice(0, ProvidedAmount);
-			deletedMessagesCount = await bulkDeleteMessagesInChannel(DiscordAPI, currentChannelId, firstNThMessages.map((message: APIMessage) => message.id));
+			if (ProvidedMember) {
+				var filterAuthorMessages: APIMessage[] = filter2WeeksOldMessages.filter((message: APIMessage) => message.author.id === ProvidedMember.user.id).slice(0, ProvidedAmount);
+				deletedMessagesCount = await bulkDeleteMessagesInChannel(DiscordAPI, currentChannelId, filterAuthorMessages.map((message: APIMessage) => message.id))
+			} else {
+				let firstNThMessages = filter2WeeksOldMessages.slice(0, ProvidedAmount);
+				deletedMessagesCount = await bulkDeleteMessagesInChannel(DiscordAPI, currentChannelId, firstNThMessages.map((message: APIMessage) => message.id));
+			}
+			
+			successMessage = `Done! I have deleted **${deletedMessagesCount} messages** ${filteredMessagesAuthor} from this channel.`;
+			if (filter2WeeksOldMessages.length < ProvidedAmount) successMessage = `I'm sorry! I can only bulk delete **${deletedMessagesCount} messages** ${filteredMessagesAuthor} out of ${ProvidedAmount} messages you requested due to discord limitations ={`
 		}
-		
-		var successMessage = `Done! I have deleted **${deletedMessagesCount} messages** ${filteredMessagesAuthor} from this channel.`;
-		if (filter2WeeksOldMessages.length < ProvidedAmount) successMessage = `I'm sorry! I can only bulk delete **${deletedMessagesCount} messages** ${filteredMessagesAuthor} out of ${ProvidedAmount} messages you requested due to discord limitations ={`
 		
 		return {
 			type: InteractionResponseType.ChannelMessageWithSource,

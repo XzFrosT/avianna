@@ -1,6 +1,6 @@
 {
   "name": "avianna",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "Personal discord http bot",
   "main": "dist/index.js",
   "scripts": {

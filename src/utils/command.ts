@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import { REST } from '@discordjs/rest';
-import { APIApplicationCommandOption, APIInteractionResponse, InteractionResponseType, MessageFlags, Routes } from 'discord-api-types/v10';
+import { APIApplicationCommand, APIApplicationCommandOption, APIInteractionResponse, InteractionResponseType, MessageFlags, Routes } from 'discord-api-types/v10';
 import { Request } from 'express';
 
 import { DiscordAppId } from "./config";
@@ -18,7 +18,6 @@ export interface Command {
 	options?: APIApplicationCommandOption[];
 	default_member_permissions?: string;
 	dm_permission?: boolean;
-	type?: any;
 	execute?: (req: Request, DiscordAPI: REST) => Promise<APIInteractionResponse>;
 }
 
@@ -39,18 +38,22 @@ export default async (req: Request): Promise<APIInteractionResponse> => {
 }
 
 export const prepareCommands = async (): Promise<number> => {
-	const ExistingCommands: any = await getApplicationCommands();
-	const AvailableCommands = fs.readdirSync(__dirname.substring(0, __dirname.lastIndexOf("/")) + "/commands/")
+	const ExistingCommands: APIApplicationCommand[] = await getApplicationCommands() as APIApplicationCommand[];
+	const AvailableCommands: string[] = fs.readdirSync(__dirname.substring(0, __dirname.lastIndexOf("/")) + "/commands/")
 	.map((CommandFile: string) => CommandFile.substring(0, CommandFile.lastIndexOf(".")));
 	
-	fs.readdirSync(__dirname.substring(0, __dirname.lastIndexOf("/")) + "/commands/").forEach(async (CommandFile: string) => {
+	for (const DeletedCommand of ExistingCommands) {
+		if (!AvailableCommands.includes(DeletedCommand.name)) deleteApplicationCommand(DeletedCommand);
+	}
+	
+	AvailableCommands.forEach(async (CommandFile: string) => {
 		const command = (await import(__dirname.substring(0, __dirname.lastIndexOf("/")) + `/commands/${CommandFile}`)).default;
 		
 		if (ExistingCommands.length >= 1) {
-			const MappedExistingCommands = ExistingCommands.map((ACommand: any) => ACommand.name);
+			const MappedExistingCommands = ExistingCommands.map((ACommand: APIApplicationCommand) => ACommand.name);
 			
 			if (MappedExistingCommands.includes(command.name)) {
-				const MatchedCommand = ExistingCommands.filter((ACommand: any) => ACommand.name === command.name)[0];
+				const MatchedCommand = ExistingCommands.filter((ACommand: APIApplicationCommand) => ACommand.name === command.name)[0];
 				
 				editApplicationCommand(MatchedCommand, command);
 			} else createApplicationCommand(command);
@@ -67,7 +70,13 @@ export const transformCommand = (command: Command) => {
 }
 
 export const getApplicationCommands = async () => {
-	return await DiscordAPI.get(Routes.applicationCommands(DiscordAppId));
+	try {
+		return await DiscordAPI.get(Routes.applicationCommands(DiscordAppId)) as APIApplicationCommand[];
+	} catch(error: unknown) {
+		console.error(error);
+		
+		return null;
+	}
 }
 
 export const createApplicationCommand = async (command: Command) => {
@@ -77,29 +86,29 @@ export const createApplicationCommand = async (command: Command) => {
 		return await DiscordAPI.post(Routes.applicationCommands(DiscordAppId), {
 			body: transformCommand(command)
 		});
-	} catch(error: any) {
+	} catch(error: unknown) {
 		console.error(error);
 	}
 }
 
-export const deleteApplicationCommand = async (command: any) => {
+export const deleteApplicationCommand = async (command: APIApplicationCommand) => {
 	console.log(`deleting ${command.name} command.`)
 	
 	try {
 		return await DiscordAPI.delete(Routes.applicationCommand(DiscordAppId, command?.id));
-	} catch(error: any) {
+	} catch(error: unknown) {
 		console.error(error);
 	}
 }
 
-export const editApplicationCommand = async (command: any, updatedCommand: Command) => {
+export const editApplicationCommand = async (command: APIApplicationCommand, updatedCommand: Command) => {
 	console.log(`updating ${command.name} command.`)
 	
 	try {
 		return await DiscordAPI.patch(Routes.applicationCommand(DiscordAppId, command?.id), {
 			body: transformCommand(updatedCommand)
 		});
-	} catch(error: any) {
+	} catch(error: unknown) {
 		console.error(error);
 	}
 }

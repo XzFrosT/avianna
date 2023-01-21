@@ -11,8 +11,5 @@
 		"target": "es2021",
 		"allowJs": true
 	},
-	"compilerSection": {
-		"types": ["node"]
-	},
 	"include": ["./src/**/*", "environment.d.ts"]
 }

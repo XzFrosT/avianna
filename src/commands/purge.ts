@@ -15,7 +15,7 @@ export default <Command>{
 			type: 10,
 			name: "amount",
 			name_localizations: {},
-			description: "amount of message(s) to purge (min: 1, max: 100)",
+			description: "amount of message(s) to purge (min: 2, max: 100)",
 			description_localizations: {},
 			required: true,
 			min_value: 2,

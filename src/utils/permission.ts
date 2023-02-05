@@ -7,7 +7,7 @@ function swapPerms(): {[readablePermission: string]: string} {
 		[key: string]: string
 	} = {}
 	
-	Object.keys(PermissionFlagsBits).forEach((key) => {
+	Object.keys(PermissionFlagsBits).forEach((key: string) => {
 		Object.defineProperty(Flags, key, {
 			value: key,
 			enumerable: true
@@ -19,26 +19,21 @@ function swapPerms(): {[readablePermission: string]: string} {
 
 export function convertPerms(permNumber: bigint): string[] {
 	let evaluatedPerms: {
-		[key:string]: {
-			[key:string]: number | bigint
-		}
+		[permission: string]: number | bigint;
 	} = {};
 	
 	for (let perm in PermissionFlagsBits) {
-		let hasPerm = Boolean(BigInt(permNumber) & BigInt(PermissionFlagsBits[perm as keyof typeof PermissionFlagsBits]));
+		let hasPerm = ((BigInt(permNumber) & BigInt(PermissionFlagsBits[perm as keyof typeof PermissionFlagsBits])) === BigInt(permNumber));
 		
-		Object.defineProperty(evaluatedPerms, perm, {
+		if (hasPerm) Object.defineProperty(evaluatedPerms, perm, {
 			enumerable: true,
-			value: {
-				t: hasPerm ? 1 : 0,
-				v: PermissionFlagsBits[perm as keyof typeof PermissionFlagsBits]
-			}
+			value: PermissionFlagsBits[perm as keyof typeof PermissionFlagsBits]
 		});
 	}
 	
 	return Object.keys(
 		Object.fromEntries(
-			Object.entries(evaluatedPerms).filter(([key, value]) => value.t === 1)
+			Object.entries(evaluatedPerms)
 		)
 	);
 };

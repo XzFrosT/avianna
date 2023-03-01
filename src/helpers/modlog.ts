@@ -8,51 +8,22 @@ import { forHumans, getUserUrl, makeAvatarUrl, me } from "../utils/functions";
 interface LogOptions {
 	action: string;
 	user: APIUser;
-	moderator: APIUser | null;
-	reason: string | null;
-	channel: string | null;
-	message: string | null;
-	duration: string | number | null;
+	moderator?: APIUser | null;
+	reason?: string | null;
+	channel?: string | null;
+	message?: string | null;
+	duration?: string | number | null;
 }
 
 export default async (DiscordAPI: REST, Log: LogOptions): Promise<void> => {
 	const ActionEmbedColor = (Object.keys(Colors)).filter((color: string) => color.toLowerCase().split(".")[1] === Log.action+"log")[0];
-	const FieldsEmbed = [
-		{
-			name: "User",
-			value: `<@${Log?.user?.id}>`,
-			inline: true
-		},
-		{
-			name: "Moderator",
-			value: `<@${Log?.moderator ? Log?.moderator?.id : (await me()).id}>`,
-			inline: true
-		}
-	]
+	const FieldsEmbed = [];
 	
-	if (Log?.reason) FieldsEmbed.push({
-		name: "Reason",
-		value: `${Log?.reason}`,
-		inline: true
-	});
-	
-	if (Log?.channel) FieldsEmbed.push({
-		name: "Channel",
-		value: `<#${Log?.channel}>`,
-		inline: false
-	});
-	
-	if (Log?.message) FieldsEmbed.push({
-		name: "Message",
-		value: `${Log?.message}`,
-		inline: false
-	});
-	
-	if (Log?.duration) {
-		FieldsEmbed.push({
-			name: "Duration",
-			value: `${typeof Log?.duration === "number" ? forHumans(Log?.duration) : Log?.duration}`,
-			inline: false
+	for (var k in {...Log}) {
+		if ({...Log}.hasOwnProperty(k) && {...Log}[k] !== null && k !== "action") FieldsEmbed.push({
+			name: `${k.charAt(0).toUpperCase()}${k.slice(1)}`,
+			value: String((typeof {...Log}[k] === "object")? `<@${({...Log}[k] as APIUser)?.id}>`: {...Log}[k]),
+			inline: (k === "message" || k === "duration")? true: false,
 		});
 	}
 	

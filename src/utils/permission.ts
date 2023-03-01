@@ -23,7 +23,7 @@ export function convertPerms(permNumber: bigint): string[] {
 	} = {};
 	
 	for (let perm in PermissionFlagsBits) {
-		let hasPerm = ((BigInt(permNumber) & BigInt(PermissionFlagsBits[perm as keyof typeof PermissionFlagsBits])) === BigInt(permNumber));
+		let hasPerm = (BigInt(permNumber) & BigInt(PermissionFlagsBits[perm as keyof typeof PermissionFlagsBits])) == BigInt(PermissionFlagsBits[perm as keyof typeof PermissionFlagsBits]);
 		
 		if (hasPerm) Object.defineProperty(evaluatedPerms, perm, {
 			enumerable: true,

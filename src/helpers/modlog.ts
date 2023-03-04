@@ -22,7 +22,7 @@ export default async (DiscordAPI: REST, Log: LogOptions): Promise<void> => {
 	for (var k in {...Log}) {
 		if ({...Log}.hasOwnProperty(k) && {...Log}[k] !== null && k !== "action") FieldsEmbed.push({
 			name: `${k.charAt(0).toUpperCase()}${k.slice(1)}`,
-			value: String((typeof {...Log}[k] === "object")? `<@${({...Log}[k] as APIUser)?.id}>`: {...Log}[k]),
+			value: String((typeof {...Log}[k] === "object")? `<@${({...Log}[k] as APIUser)?.id}>`: ((k === "duration")? forHumans(Number({...Log}[k])): {...Log}[k])),
 			inline: (k === "message" || k === "duration")? true: false,
 		});
 	}

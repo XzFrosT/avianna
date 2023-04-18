@@ -28,11 +28,14 @@
   },
   "dependencies": {
     "@discordjs/rest": "^1.1.0",
+    "axios": "^1.3.4",
     "discord-interactions": "^3.2.0",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "mongoose": "^6.6.1",
+    "node-replicate": "^1.1.3",
     "parse-duration": "^1.0.2",
+    "unstreamify": "^1.0.1",
     "ws": "^8.12.1"
   },
   "devDependencies": {
